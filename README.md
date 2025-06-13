@@ -13,9 +13,9 @@ The application's design emphasizes simplicity, intuitive design, class-focused 
 ## Technology Stack
 The application will be developed using Python as the core programming language as it is well-suited for managing data structures, expandable arrays, and handling input/output operations. The language also offers standard libraries for date and time logic.
 
-The project will utilize the ncurses library for the user interface, which will allow for the creation of a text-based graphical interface that can render calendars, forms, and interactive menus in the terminal.
+The project will utilize the ncurses library for the user interface, which will be used to create a text-based graphical interface that can render the calendar interface and interactive dialogs in the terminal.
 
-Development will be conducted in Visual Studio Code, which provides robust support for Python development as well as Azure and Git integration.
+Development will mainly be done in Visual Studio Code, which provides support for Python development as well as Azure and Git integration.
 
 Data persistence will be handled locally using plain text. Class sub-calendars will be stored in the following format, with each line designating an assignment name, due date, and completion status:
 ```COP4504
