@@ -18,14 +18,14 @@ The project will utilize the ncurses library for the user interface, which will 
 Development will mainly be done in Visual Studio Code, which provides support for Python development as well as Azure and Git integration.
 
 Data persistence will be handled locally using plain text. Class sub-calendars will be stored in the following format, with each line designating an assignment name, due date, and completion status:
-`cop4504.cal`
 ```
+cop4504.cal
 "Week 2 Deliverables", 06152025, true
 "Week 3 Deliverables", 06212025, false
 ...
 ```
 
-These values will be read and parsed at runtime and stored in an assignment struct list, which will be then be stored in a calendar struct. The class sub-calendar title will be read from the filename and stored in the calendar struct.
+These values will be read and parsed at runtime and stored in an assignment struct list, which will then be stored in a calendar struct. The class sub-calendar title will be read from the filename and stored in the calendar struct.
 
 ## Design Overview
 ### Core Features
@@ -40,7 +40,7 @@ The project will utilize two custom data structures: **assignment** and **class*
 | name              | string  | name of assignment                                                                               |
 | date              | int     | due date of assignment as MMDDYYYY, e.g., 06152025, used to position assignments on the calendar |
 | type              | int     | references time estimate table for time estimate aggregation purposes                            |
-| completion status | boolean | toggle completed/uncompleted (default value false)                                               |
+| completed         | boolean | toggle completed/uncompleted (default value false)                                               |
 
 **class**
 | variable | type    | description                                                            |
@@ -62,7 +62,7 @@ No external libraries are required as the application uses Python’s standard l
 
 ### Setup and Installation
 Clone the repository:
-```bash
+```
 git clone https://github.com/ma-choo/calicula.git
 ```
 
