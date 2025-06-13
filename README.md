@@ -1,5 +1,4 @@
 ## Project Purpose
----
 The purpose of this project is to address the challenge of time management and academic workload organization among students. Many students struggle with tracking assignments, prioritizing tasks, and maintaining a balanced academic schedule. These challenges can lead to last-minute cramming, missed deadlines, lower academic performance, and increased stress.
 
 This project introduces a terminal-based student calendar application. This application will enable students to:
@@ -12,7 +11,6 @@ This project introduces a terminal-based student calendar application. This appl
 The application's design emphasizes simplicity, intuitive design, class-focused planning, and time estimation to give students better control over their schedules.
 
 ## Technology Stack
----
 The application will be developed using Python as the core programming language as it is well-suited for managing data structures, expandable arrays, and handling input/output operations. The language also offers standard libraries for date and time logic.
 
 The project will utilize the ncurses library for the user interface, which will allow for the creation of a text-based graphical interface that can render calendars, forms, and interactive menus in the terminal.
@@ -29,7 +27,6 @@ Data persistence will be handled locally using plain text. Class sub-calendars w
 These values will be read and parsed at runtime and stored in an assignment struct list, which will be then be stored in a calendar struct. The class sub-calendar title will be read from the filename and stored in the calendar struct.
 
 ## Design Overview
----
 ### Core Features
 The application will feature an interactive gregorian calendar interface that displays upcoming assignments separated by class. It will also offer functionality for new assignments by selecting specific dates with the cursor. Each class will have its own sub-calendar, enabling students to manage their coursework separately and toggle the visibility of individual classes for a more focused view. The project will also generate weekly study time estimates using a reference table that associates each assignment type with an estimated time range (e.g., quizzes may require 20 to 30 minutes, while essays might take 1 to 3 hours). Additionally, the application will support task completion tracking, allowing users to mark assignments as completed or uncompleted.
 
@@ -43,6 +40,7 @@ The project will utilize two custom data structures: **assignment** and **class*
 | date              | int     | due date of assignment as MMDDYYYY, e.g., 06152025, used to position assignments on the calendar |
 | type              | int     | references time estimate table for time estimate aggregation purposes                            |
 | completion status | boolean | toggle completed/uncompleted (default value false)                                               |
+
 **class**
 | variable | type    | description                                                            |
 | -------- | ------- | ---------------------------------------------------------------------- |
@@ -54,7 +52,6 @@ The project will utilize two custom data structures: **assignment** and **class*
 The application's primary interface is a home view that displays an interactive Gregorian calendar. Users can navigate dates using the arrow keys or Vim-style keybindings and provides a cursor-based mechanism for selecting specific days. From this view, users can create, view, or delete assignments directly. Actions will generally be performed using key shortcuts. For example, pressing `a` may open a dialog to create a new assignment at the current selection within the currently selected sub-calendar, `c` will open a dialog that lists the currently loaded sub-calendars and allow for creation of new sub-calendars, `v` may toggle the visibility of individual class sub-calendars, and `d` may be used in both dialogs to delete assignments and sub-calenders.
 
 ## Deployment
----
 ### Requirements
 To run this application locally, you will need the following:
 - Python 3.11 or higher  
