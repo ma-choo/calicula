@@ -32,7 +32,7 @@ These values will be read and parsed at runtime and stored in an assignment stru
 The application will feature an interactive Gregorian calendar interface that displays upcoming assignments separated by class. It will also offer functionality for new assignments by selecting specific dates with the cursor. Each class will have its own sub-calendar, enabling students to manage their coursework separately and toggle the visibility of individual classes for a more focused view. The project will also generate weekly study time estimates using a reference table that associates each assignment type with an estimated time range (e.g., quizzes may require 20 to 30 minutes, while essays might take 1 to 3 hours). Additionally, the application will support task completion tracking, allowing users to mark assignments as completed or uncompleted.
 
 ### Data Structures
-The project will utilize two custom data structures: **assignment** and **class**.
+The project will utilize two custom data structures: **assignment** and **subcal**.
 
 **assignment**
 | variable          | type    | description                                                                                      |
@@ -42,11 +42,11 @@ The project will utilize two custom data structures: **assignment** and **class*
 | type              | int     | references time estimate table for time estimate aggregation purposes                            |
 | completed         | boolean | toggle completed/uncompleted (default value false)                                               |
 
-**class**
+**subcal**
 | variable | type    | description                                                            |
 | -------- | ------- | ---------------------------------------------------------------------- |
-| name     | string  | name of class                                                          |
-| color    | int     | used to designate ncurses colors from 0 to 8                          |
+| name     | string  | name of sub-calendar                                                   |
+| color    | int     | used to designate ncurses colors from 0 to 8                           |
 | hide     | boolean | used to toggle visibility of class sub-calendars (default value false) |
 
 ### User Interface
