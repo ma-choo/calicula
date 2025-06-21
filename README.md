@@ -32,22 +32,35 @@ These values will be read and parsed at runtime and stored in an assignment stru
 The application will feature an interactive Gregorian calendar interface that displays upcoming assignments separated by class. It will also offer functionality for new assignments by selecting specific dates with the cursor. Each class will have its own sub-calendar, enabling students to manage their coursework separately and toggle the visibility of individual classes for a more focused view. The project will also generate weekly study time estimates using a reference table that associates each assignment type with an estimated time range (e.g., quizzes may require 20 to 30 minutes, while essays might take 1 to 3 hours). Additionally, the application will support task completion tracking, allowing users to mark assignments as completed or uncompleted.
 
 ### Data Structures
-The project will utilize two custom data structures: **assignment** and **subcal**.
+The project will utilize two custom data structures: **Assignment** and **Subcalendar**.
 
-**assignment**
-| variable          | type    | description                                                                                      |
-| ----------------- | ------- | ------------------------------------------------------------------------------------------------ |
-| name              | string  | name of assignment                                                                               |
-| date              | int     | due date of assignment as MMDDYYYY, e.g., 06152025, used to position assignments on the calendar |
-| type              | int     | references time estimate table for time estimate aggregation purposes                            |
-| completed         | boolean | toggle completed/uncompleted (default value false)                                               |
+**Assignment**
+| variable          | type    | description                                                                                             |
+| ----------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| name              | string  | name of assignment                                                                                      |
+| date              | string  | due date of assignment in MMDDYYYY format, e.g., 06152025, used to position assignments on the calendar |
+| type              | int     | references time estimate table for time estimate aggregation purposes                                   |
+| completed         | boolean | toggle completed/uncompleted (default value false)                                                      |
 
-**subcal**
-| variable | type    | description                                                            |
-| -------- | ------- | ---------------------------------------------------------------------- |
-| name     | string  | name of sub-calendar                                                   |
-| color    | int     | used to designate ncurses colors from 0 to 8                           |
-| hide     | boolean | used to toggle visibility of class sub-calendars (default value false) |
+**Class functions:**
+
+`toggle_completion()` - switch the `completed` boolean between true/false
+
+**Subcalendar**
+| variable        | type          | description                                                            |
+| --------------- | ------------  | ---------------------------------------------------------------------- |
+| name            | string        | name of sub-calendar                                                   |
+| color           | int           | used to designate ncurses colors from 0 to 8                           |
+| hidden          | boolean       | used to toggle visibility of class sub-calendars (default value false) |
+| assignments     | assignment[]  | list of assignments                                                    |
+
+**Class functions:**
+
+`insert_assignment()` - inserts an assignment into the `assignments[]` list
+
+`pop_assignment()` - pop an assignment from the `assigments[]` list
+
+`hide()` - switch the `hidden` boolean between true/false
 
 ### User Interface
 The application's primary interface is a home view that displays an interactive Gregorian calendar. Users can navigate dates using the arrow keys or Vim-style keybindings and provide a cursor-based mechanism for selecting specific days. From this view, users can create, view, or delete assignments directly. Actions will generally be performed using keyboard shortcuts. For example, pressing `a` may open a dialog to create a new assignment at the current selection within the currently selected sub-calendar, `c` will open a dialog that lists the currently loaded sub-calendars and allow for creation of new sub-calendars, `v` may toggle the visibility of individual class sub-calendars, and `d` may be used in both dialogs to delete assignments and sub-calenders.
