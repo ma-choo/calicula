@@ -2,6 +2,7 @@
 
 from flask import Flask
 from subcalendar import Assignment, Subcalendar
+from ui import UI
 
 app = Flask(__name__)
 
