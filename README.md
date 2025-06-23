@@ -64,14 +64,17 @@ The project will utilize two custom data structures: **Assignment** and **Subcal
 `hide()` - switch the `hidden` boolean between true/false
 
 ### Algorithms
-`zeller()` - calculate first-day offset to properly render calendar view.
+`zeller()` - calculate first-day offset to properly render the calendar view.
 
 `is_leap_year()` - determine leap year.
 
 ### Class Structure
 `main.py` - application startup and main loop.
+
 `ui.py` - renders the calendar view and handles user input
+
 `subcalendar.py` - defines `Assignment` and `Subcalendar` data structures.
+
 `utils.py` - provides date, time, and calendar logic, as well as some other useful helper functions.
 
 ## Deployment
