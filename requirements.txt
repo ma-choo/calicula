@@ -1,2 +1,2 @@
 flask
-azure-blob-storage
+azure-storage-blob
