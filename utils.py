@@ -1,69 +1,60 @@
-# utils.py
+# utils.py - date/time utility functions
+# TODO: lots of normalization going on here currently. maybe refactor to make it less confusing?
 
-from datetime import datetime
+import calendar
+from datetime import date, datetime
 
-# Internal cache for current time
-_current_time = None
-
-month_name = [
-    "January", "February", "March", "April",
-    "May", "June", "July", "August",
-    "September", "October", "November", "December"
-]
-
-mon_name = [
-    "Jan", "Feb", "Mar", "Apr",
-    "May", "Jun", "Jul", "Aug",
-    "Sep", "Oct", "Nov", "Dec"
-]
-
-day_name = [
-    "Sunday", "Monday", "Tuesday",
-    "Wednesday", "Thursday", "Friday", "Saturday"
-]
-
-days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-def init_current_time():
-    """Initialize the current date (can be used once at startup)."""
-    global _current_time
-    _current_time = datetime.now()
+def contains_bad_chars(name: str) -> bool:
+    invalid_chars = {'\t', '\n', '\r', '\x1b', ',' '<', '>', ':', '"', '/', '\\', '|'}
+    if any(ch in invalid_chars for ch in name):
+        return True
+    if any(ord(ch) < 32 for ch in name):  # check for ascii control chars
+        return True
+    return False
 
 def get_current_day():
-    """Get the current day (1–31)."""
-    return _current_time.day if _current_time else datetime.now().day
+    return datetime.now().day
 
 def get_current_month():
-    """Get the current month (0–11, zero-based to match C logic)."""
-    return (_current_time.month - 1) if _current_time else datetime.now().month - 1
+    return datetime.now().month - 1  # zero-based for internal logic
 
 def get_current_year():
-    """Get the current year."""
-    return _current_time.year if _current_time else datetime.now().year
+    return datetime.now().year
 
+def get_day_name(index: int) -> str:
+    day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    return day_names[index]
 
-def get_month_name(i: int) -> str:
-    return month_name[i] if 0 <= i < 12 else "ERR"
+def get_day_date_name(d: date | datetime) -> str:
+    return calendar.day_name[d.weekday()]
 
-def get_mon_name(i: int) -> str:
-    return mon_name[i] if 0 <= i < 12 else "ERR"
+# TODO: replace this with a function from the calendar module
+def get_month_name(month_num):
+    month_names = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+    return month_names[month_num]
 
-def get_day_name(i: int) -> str:
-    return day_name[i] if 0 <= i < 7 else "ERR"
+def get_mon_name(month_num):
+    return get_month_name(month_num)[:3]
 
-def get_days_in_month(month: int) -> int:
-    if 0 <= month < 12:
-        return days_in_month[month]
-    return 0
+def get_days_in_month(month, year=None):
+    if year is None:
+        year = datetime.now().year
+    month += 1  # convert from 0-based to 1-based
+    if month == 2:
+        # leap year check
+        if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
+            return 29
+        return 28
+    if month in [4, 6, 9, 11]:
+        return 30
+    return 31
 
-def determine_leap_year(year: int):
-    if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
-        days_in_month[1] = 29
-    else:
-        days_in_month[1] = 28
-
-def zeller(month: int, year: int) -> int:
-    # Normalize month to 1-based for Zeller's Congruence
+# zeller's algorithm: used for getting a first day offset for proper calendar view display
+def zeller(month, year):
+    # normalize month to 1-based
     month += 1
     day = 1
     if month < 3:
@@ -77,4 +68,3 @@ def zeller(month: int, year: int) -> int:
               (z_year % 100) // 4 - 2 * (z_year // 100) +
               (z_year // 400) + 77) % 7
     return offset
-

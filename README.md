@@ -19,7 +19,7 @@ Development will mainly be done in Visual Studio Code, which provides support fo
 
 Data persistence will be handled locally using plain text. Class sub-calendars will be stored in the following format, with each line designating an assignment name, due date, and completion status:
 ```
-cop4504.cal
+cop4504
 "Week 2 Deliverables", 06152025, true
 "Week 3 Deliverables", 06212025, false
 ...
@@ -66,8 +66,6 @@ The project will utilize two custom data structures: **Assignment** and **Subcal
 ### Algorithms
 `zeller()` - calculate first-day offset to properly render the calendar view.
 
-`is_leap_year()` - determine leap year.
-
 ### Class Structure
 `main.py` - application startup and main loop.
 
@@ -79,9 +77,8 @@ The project will utilize two custom data structures: **Assignment** and **Subcal
 
 ## Deployment
 ### Requirements
-To run this application locally, you will need:
-- Python
-- A terminal emulator  
+- Python3
+- azure-blob-storage
 
 ### Setup and Installation
 Clone the repository:
@@ -91,7 +88,28 @@ git clone https://github.com/ma-choo/calicula.git
 
 Run the application from the terminal:
 ```
-python calicula.py
+python main.py
 ```
 
-Data is stored locally in plain text files in `~/.calicula`. Calendar files are read and written on startup and exit.
+## Storage
+This application supports both local storage and Azure blob storage.
+
+### Local Storage
+The application will use local storage by default, but you may also configure `~/.config/calicula/config` as such:
+```
+[storage]
+backend = local
+```
+
+Subcalendars will be stored locally in plain text files in `~/.config/calicula/subcalendars`. These subcalendar files are read and written on startup and exit.
+
+### Azure Blob Storage
+To store subcalendars in an Azure blob storage account, configure `~/.config/calicula/config` as such:
+```
+[storage]
+backend = azure
+
+[azure]
+connection_string = <YOUR_AZURE_CONNECTION_STRING>
+container = <YOUR_CONTAINER_NAME>
+```
