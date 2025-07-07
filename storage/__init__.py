@@ -4,7 +4,7 @@ from .local import LocalStorageBackend
 from .azure_blob import AzureBlobStorageBackend
 
 def get_backend():
-    # attempt to get the backend type from environment variable (for azure app service)
+    # try azure app service env variables
     backend_type = os.getenv("CALICULA_STORAGE_BACKEND")
 
     if backend_type is None:

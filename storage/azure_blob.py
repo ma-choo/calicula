@@ -7,8 +7,8 @@ from .backend_base import StorageBackend
 
 class AzureBlobStorageBackend(StorageBackend):
     def __init__(self):
-        # try environment variables first (for azure app service)
-        self.connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+        # try azure app service env variables
+        self.connection_string = os.getenv("AZURE_CONNECTION_STRING")
         self.container_name = os.getenv("AZURE_CONTAINER")
 
         # fallback to config file for local development
