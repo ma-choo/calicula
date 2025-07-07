@@ -7,12 +7,21 @@ from .backend_base import StorageBackend
 
 class AzureBlobStorageBackend(StorageBackend):
     def __init__(self):
-        config_path = os.path.expanduser("~/.config/calicula/config")
-        config = configparser.ConfigParser()
-        config.read(config_path)
+        # try environment variables first (for azure app service)
+        self.connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+        self.container_name = os.getenv("AZURE_CONTAINER")
 
-        self.connection_string = config.get("azure", "connection_string")
-        self.container_name = config.get("azure", "container")
+        # fallback to config file for local development
+        if not self.connection_string or not self.container_name:
+            config_path = os.path.expanduser("~/.config/calicula/config")
+            config = configparser.ConfigParser()
+            config.read(config_path)
+
+            if not self.connection_string:
+                self.connection_string = config.get("azure", "connection_string")
+
+            if not self.container_name:
+                self.container_name = config.get("azure", "container")
 
         service_client = BlobServiceClient.from_connection_string(self.connection_string)
         self.container_client = service_client.get_container_client(self.container_name)
