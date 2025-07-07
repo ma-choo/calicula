@@ -20,6 +20,25 @@ class Assignment:
     def __repr__(self):
         return f"Assignment  name: '{self.name}'  date: {self.date.strftime('%m/%d/%Y')}  completed: {self.completed}"
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "year": self.year,
+            "month": self.month,
+            "day": self.day,
+            "completed": self.completed
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            name=data["name"],
+            year=data["year"],
+            month=data["month"],
+            day=data["day"],
+            completed=data.get("completed", False)
+        )
+
 class Subcalendar:
     def __init__(self, name: str, color=1):
         self.name = name
@@ -42,6 +61,21 @@ class Subcalendar:
 
     def change_color (self, color):
         self.color = color
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "color": self.color,
+            "hidden": self.hidden,
+            "assignments": [a.to_dict() for a in self.assignments]
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        subcal = cls(data["name"], data.get("color", 1))
+        subcal.hidden = data.get("hidden", False)
+        subcal.assignments = [Assignment.from_dict(a) for a in data.get("assignments", [])]
+        return subcal
 
     # ---- LOCAL FILE I/O ----
     @classmethod
