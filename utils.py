@@ -5,7 +5,7 @@ import calendar
 from datetime import date, datetime
 
 def contains_bad_chars(name: str) -> bool:
-    invalid_chars = {'\t', '\n', '\r', '\x1b', ',' '<', '>', ':', '"', '/', '\\', '|'}
+    invalid_chars = {'\t', '\n', '\r', '\x1b', ',', '<', '>', ':', '"', '/', '\\', '|'}
     if any(ch in invalid_chars for ch in name):
         return True
     if any(ord(ch) < 32 for ch in name):  # check for ascii control chars

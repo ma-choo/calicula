@@ -1,3 +1,5 @@
+# storage/azure_blob.py
+
 import configparser
 import os
 from typing import List
@@ -40,6 +42,22 @@ class AzureBlobStorageBackend(StorageBackend):
         data = subcalendar.to_blob()
         blob_client = self.container_client.get_blob_client(subcalendar.name)
         blob_client.upload_blob(data, overwrite=True)
+
+    def rename(self, old_name: str, new_name: str):
+        old_blob = self.container_client.get_blob_client(old_name)
+        new_blob = self.container_client.get_blob_client(new_name)
+
+        # Start blob copy
+        copy = new_blob.start_copy_from_url(old_blob.url)
+
+        # Optionally wait for copy to finish
+        props = new_blob.get_blob_properties()
+        while props.copy.status == "pending":
+            props = new_blob.get_blob_properties()
+
+        # Delete old blob
+        old_blob.delete_blob()
+
 
     @property
     def name(self):

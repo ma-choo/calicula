@@ -1,3 +1,5 @@
+# main.py
+
 import curses
 from ui import UI
 from storage import get_backend

@@ -1,3 +1,5 @@
+# storage/__init__.py
+
 import configparser
 import os
 from .local import LocalStorageBackend

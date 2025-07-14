@@ -1,15 +1,18 @@
+# subcalendar.py
+
 import os
 from typing import List
 from datetime import datetime
 
 class Assignment:
-    def __init__(self, name: str, date: str, completed: bool):
+    def __init__(self, name: str, date: str, completed: bool, studytime: int = 0):
         self.name = name
         self.completed = completed
         self.date = datetime.strptime(date, "%Y%m%d").date()
         self.month = self.date.month
         self.day = self.date.day
         self.year = self.date.year
+        self.studytime = studytime  # in minutes
 
     def rename(self, name: str):
         self.name = name
@@ -18,7 +21,7 @@ class Assignment:
         self.completed = not self.completed
 
     def __repr__(self):
-        return f"Assignment  name: '{self.name}'  date: {self.date.strftime('%m/%d/%Y')}  completed: {self.completed}"
+        return f"Assignment  name: '{self.name}'  date: {self.date.strftime('%m/%d/%Y')}  completed: {self.completed}  studytime: {self.studytime} min"
 
     def to_dict(self):
         return {
@@ -26,17 +29,18 @@ class Assignment:
             "year": self.year,
             "month": self.month,
             "day": self.day,
-            "completed": self.completed
+            "completed": self.completed,
+            "studytime": self.studytime,
         }
 
     @classmethod
     def from_dict(cls, data):
+        date = f"{data['year']:04d}{data['month']:02d}{data['day']:02d}"
         return cls(
             name=data["name"],
-            year=data["year"],
-            month=data["month"],
-            day=data["day"],
-            completed=data.get("completed", False)
+            date=date,
+            completed=data.get("completed", False),
+            studytime=data.get("studytime", 0)
         )
 
 class Subcalendar:
@@ -59,7 +63,7 @@ class Subcalendar:
     def toggle_hidden(self):
         self.hidden = not self.hidden
 
-    def change_color (self, color):
+    def change_color(self, color):
         self.color = color
 
     def to_dict(self):
@@ -100,11 +104,12 @@ class Subcalendar:
             subcalendar.color = int(line.strip())
             for line in file:
                 parts = line.strip().split(",")
-                if len(parts) == 3:
+                if len(parts) >= 3:
                     name = parts[0]
                     date = parts[1]
                     completed = int(parts[2])
-                    assignment = Assignment(name, date, completed)
+                    studytime = int(parts[3]) if len(parts) > 3 else 0
+                    assignment = Assignment(name, date, completed, studytime)
                     subcalendar.insert_assignment(assignment)
         except Exception as e:
             print(f"Error reading {name}: {e}")
@@ -115,7 +120,7 @@ class Subcalendar:
         with open(filename, "w") as file:
             file.write(f"{self.color}\n")
             for a in self.assignments:
-                file.write(f"{a.name},{a.date.strftime('%Y%m%d')},{int(a.completed)}\n")
+                file.write(f"{a.name},{a.date.strftime('%Y%m%d')},{int(a.completed)},{a.studytime}\n")
 
     # ---- BLOB STORAGE I/O ----
     @classmethod
@@ -127,7 +132,7 @@ class Subcalendar:
     def to_blob(self) -> str:
         lines = [f"{self.color}"]
         for a in self.assignments:
-            lines.append(f"{a.name},{a.date.strftime('%Y%m%d')},{int(a.completed)}")
+            lines.append(f"{a.name},{a.date.strftime('%Y%m%d')},{int(a.completed)},{a.studytime}")
         return "\n".join(lines)
 
     def __repr__(self):

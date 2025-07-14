@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Subcalendars</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    .assignment { margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Subcalendars</h1>
+  <div id="results">Loading...</div>
+
+  <script>
+    fetch("/subcalendars")
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("results");
+        container.innerHTML = '';
+        data.forEach(subcal => {
+          const div = document.createElement('div');
+          div.className = 'assignment';
+          div.innerHTML = `<h3>${subcal.name}</h3>` +
+                          (subcal.assignments.length ? '<ul>' + subcal.assignments.map(a =>
+                              `<li>${a.name} (${a.month}/${a.day}/${a.year}) - ${a.completed ? '✔' : '✘'}</li>`
+                          ).join('') + '</ul>' : '<p>No assignments</p>');
+          container.appendChild(div);
+        });
+      });
+  </script>
+</body>
+</html>

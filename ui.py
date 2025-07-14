@@ -520,10 +520,24 @@ Quit
             self.msg = "Error: assignment name contains forbidden characters"
             return False
 
+        self.promptwin.erase()
+        self.promptwin.addstr(0, 0, "Study time: ")
+        curses.echo()
+        try:
+            input_str = self.promptwin.getstr(0, 30, 10).decode('utf-8').strip()
+        finally:
+            curses.noecho()
+            curses.curs_set(0)
+
+        try:
+            studytime = int(input_str) if input_str else 0
+        except ValueError:
+            studytime = 0
+
         date_str = f"{year}{month:02d}{day:02d}"
 
         try:
-            subcalendar.insert_assignment(Assignment(name, date_str, 0))
+            subcalendar.insert_assignment(Assignment(name, date_str, 0, studytime))
         except Exception as e:
             self.msg = f"Failed to create new assignment: {e}"
             return False
@@ -548,11 +562,36 @@ Quit
 
         return month_changed  # redraw only if month or year changed
 
+    from datetime import timedelta
+
+    # TODO: optimize this by only calling this when the week changes
+    def get_selected_week_start(self) -> date:
+        selected = date(self.working_year, self.working_month + 1, self.selected_day)
+        return selected - timedelta(days=selected.weekday())  # monday?
+
+    def sum_studytime_for_week(self, subcalendars, selected_week_start):
+        week_end = selected_week_start + timedelta(days=6)
+        total_minutes = 0
+
+        for subcal in subcalendars:
+            if subcal.hidden:
+                continue
+            for a in subcal.assignments:
+                if selected_week_start <= a.date <= week_end:
+                    total_minutes += a.studytime
+
+        return total_minutes
+
+
     # prompt - handles input and returns two booleans to redraw the main window and continue the main loop
     def prompt(self, subcalendars: list[Subcalendar]) -> tuple[bool, bool]:
         curses.curs_set(0)
         subcalendar = subcalendars[self.selected_subcal]
-        status = f"{'[+]' if not self.saved else ''}{f"  {self.operator} " if self.operator else ' '} {self.storage.name}  {self.update_counter}  {self.count_buffer if self.count_buffer else self.delta}  {'[H]' if subcalendar.hidden else ''}{subcalendar.name}"
+
+        selected_week_start = self.get_selected_week_start()
+        study_minutes = self.sum_studytime_for_week(subcalendars, selected_week_start)
+
+        status = f"{'[+]' if not self.saved else ''}{f"  {self.operator} " if self.operator else ' '} {self.storage.name}  study time: {study_minutes}  {self.update_counter}  {self.count_buffer if self.count_buffer else self.delta}  {'[H]' if subcalendar.hidden else ''}{subcalendar.name}"
 
         self.promptwin.erase()
         try:
@@ -723,9 +762,16 @@ Quit
                         self.msg = f"Error: Subcalendar '{name}' already exists"
                     else:
                         self.promptwin.erase()
+
+                        old_name = subcalendar.name
                         subcalendar.rename(name)
+
+                        if old_name != name:
+                            self.storage.rename(old_name, name)
+
                         self.msg = f"Renamed Subcalendar '{name}'"
                         self.saved = False
+
 
         # toggle calendar visibility
         elif key == ord('z'):
