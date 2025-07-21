@@ -1,7 +1,7 @@
 ## Project Purpose
 The purpose of this project is to address the challenge of time management and academic workload organization among students. Many students struggle with tracking assignments, prioritizing tasks, and maintaining a balanced academic schedule. These challenges can lead to last-minute cramming, missed deadlines, lower academic performance, and increased stress.
 
-This project introduces a terminal-based student calendar application. This application will enable students to:
+This project introduces a terminal-based student calendar application. This application enables students to:
 - Organize assignments by class
 - Estimate weekly study time based on assignment type
 - Visualize their workload more clearly
@@ -11,74 +11,123 @@ This project introduces a terminal-based student calendar application. This appl
 The application's design emphasizes simplicity, intuitive design, class-focused planning, and time estimation to give students better control over their schedules.
 
 ## Technology Stack
-The application will be developed using Python as the core programming language, as it is well-suited for managing data structures, expandable arrays, and handling input/output operations. The language also offers standard libraries for date and time logic.
+The application is developed using Python as the core programming language, which is well-suited for managing data structures, expandable arrays, and handling input/output operations. The language also offers standard libraries for date time logic and file operations.
 
-The project will utilize the ncurses library for the user interface, which will be used to create a text-based graphical interface that can render the calendar interface and interactive dialogs in the terminal.
+The project uses the ncurses library to create a terminal-based graphical interface that can render the calendar interface and interactive dialogs in the terminal.
 
-Development will mainly be done in Visual Studio Code, which provides support for Python development as well as Azure and Git integration.
+Development is primarily done in Visual Studio Code, which provides support for Python development as well as Azure and Git integration.
 
-Data persistence will be handled locally using plain text. Class sub-calendars will be stored in the following format, with each line designating an assignment name, due date, and completion status:
+Data persistence is handled locally using plain text. Class sub-calendars are stored in the following format, with each line designating an assignment name, due date, completion status, and optional study time:
+
 ```
 cop4504
 "Week 2 Deliverables", 06152025, true
-"Week 3 Deliverables", 06212025, false
+"Week 3 Deliverables", 06212025, false, 30
 ...
 ```
 
-These values will be read and parsed at runtime and stored in an assignment struct list, which will then be stored in a calendar struct. The class sub-calendar title will be read from the filename and stored in the calendar struct.
+These values are read and parsed at runtime and stored in an assignment list, which is then stored in a subcalendar object. The class sub-calendar title is read from the filename and stored in the subcalendar object.
 
 ## Design Overview
-### Core Features
-The application will feature an interactive Gregorian calendar interface that displays upcoming assignments separated by class. It will also offer functionality for new assignments by selecting specific dates with the cursor. Each class will have its own sub-calendar, enabling students to manage their coursework separately and toggle the visibility of individual classes for a more focused view. The project will also generate weekly study time estimates using a reference table that associates each assignment type with an estimated time range (e.g., quizzes may require 20 to 30 minutes, while essays might take 1 to 3 hours). Additionally, the application will support task completion tracking, allowing users to mark assignments as completed or uncompleted.
+### Core Functionality
+This application provides an interactive calendar interface displaying assignments separated by individual class subcalendars. The user can create/delete assignments and subcalendars, mark assignment completion, and toggle visibility of each subcalendar to focus on specific classes.
 
 ### User Interface
-The application's primary interface is a home view that displays an interactive Gregorian calendar. Users can navigate dates using the arrow keys or Vim-style keybindings and provide a cursor-based mechanism for selecting specific days. From this view, users can create, view, or delete assignments directly. Actions will generally be performed using keyboard shortcuts. For example, pressing `a` may open a dialog to create a new assignment at the current selection within the currently selected sub-calendar, `c` will open a dialog that lists the currently loaded sub-calendars and allow for creation of new sub-calendars, `v` may toggle the visibility of individual class sub-calendars, and `d` may be used in both dialogs to delete assignments and sub-calenders.
+The primary interface is a Gregorian calendar with Vim-style navigation. Navigation is done via the arrow keys or Vim-style movement keys (`h`, `j`, `k`, `l`).
+
+#### Keyboard actions:
+Calendar view:
+- `[` and `]` - Cycle subcalendar selection
+- `z` - Toggle subcalendar visibility
+- `A` - Create new assignment on the selected date withinin the selected sub-calendar
+- `Enter` - Open selected date in date view
+
+Date view:
+-  `Space` - Mark assignment completed
+- `d` - Mark assignment for deletion
+- `Enter` - Commit changes
+- `Esc` - Exit date view
+
+#### Commands
+- `:` - Enter command mode
+- `w`, `wq` - Write, write and quit
+- `nc` - Create new subcalendar
+- `dc` - Delete currently selected subcalendar
+
+### ### Vim-style Navigation
+The application incorporates Vim-style navigation commands to efficiently move through the calendar.
+
+#### Motion Commands
+You can prefix the motion commands (`h`, `j`, `k`, `l`) with numbers to move multiple steps at once. The numeric prefix is entered by typing the digits before pressing the motion key, similar to Vim. For example:
+- `3l` moves 3 days to the right
+- `2k` moves 2 weeks up (14 days)
+
+#### Goto Commands (`gg`)
+You can enter the numeric prefix as a date and press `g` twice (`gg`) to jump directly to a specific date. The date prefix can be in one of the following formats:
+- `MMDDYYYY` (8 digits): jump to that exact date.
+- `MMYYYY` (6 digits): jump to the first day of that month and year.
+- `MMDD` (4 digits): jump to that month and day in the current year.
+- `M` or `MM` (1 or 2 digits): jump to the first day of that month in the current year.
+- Pressing `gg` without entering a date prefix jumps to the current date.
+
+Press `Esc` to cancel any partial command or numeric prefix input.
 
 ### Data Structures
-The project will utilize two custom data structures: **Assignment** and **Subcalendar**.
-
 #### Assignment
-| variable          | type    | description                                                                                             |
-| ----------------- | ------- | ------------------------------------------------------------------------------------------------------- |
-| name              | string  | name of assignment                                                                                      |
-| date              | string  | due date of assignment in MMDDYYYY format, e.g., 06152025, used to position assignments on the calendar |
-| type              | int     | references time estimate table for time estimate aggregation purposes                                   |
-| completed         | boolean | toggle completed/uncompleted (default value false)                                                      |
+##### Class Variables
 
-##### Class functions
-`toggle_completion()` - switch the `completed` boolean between true/false
+| Variable    | Type      | Description                                                            |
+| ----------- | --------- | ---------------------------------------------------------------------- |
+| `name`      | `str`     | Name of the assignment                                                 |
+| `date`      | `str`     | Due date in `MMDDYYYY` format (e.g., `06152025`)                       |
+| `completed` | `boolean` | Task completion status (default: false)                                |
+| `studytime` | `int`     | Estimated study time in minutes, used for weekly studytime aggregation |
+
+##### Class Functions
+
+| Function              | Arguments         | Description                                                              |
+| --------------------- | ----------------- | ------------------------------------------------------------------------ |
+| `rename()`            | `self, name: str` | Changes the assignment name to the one supplied in the function argument |
+| `toggle_completion()` | `self`            | Toggles the `completed` boolean variable between True and False          |
 
 #### Subcalendar
-| variable        | type          | description                                                            |
-| --------------- | ------------  | ---------------------------------------------------------------------- |
-| name            | string        | name of sub-calendar                                                   |
-| color           | int           | used to designate ncurses colors from 0 to 8                           |
-| hidden          | boolean       | used to toggle visibility of class sub-calendars (default value false) |
-| assignments     | assignment[]  | list of assignments                                                    |
+##### Class Variables
 
-##### Class functions
-`insert_assignment()` - inserts an assignment into the `assignments[]` list
+| Variable      | Type               | Description                                           |
+| ------------- | ------------------ | ----------------------------------------------------- |
+| `name`        | `str`              | Name of the subcalendar                               |
+| `color`       | `int`              | ncurses color index (0–8)                             |
+| `hidden`      | `boolean`          | Toggle visibility of the subcalendar (default: false) |
+| `assignments` | `List[Assignment]` | List of assignments                                   |
 
-`pop_assignment()` - pop an assignment from the `assigments[]` list
+##### Class Functions
 
-`hide()` - switch the `hidden` boolean between true/false
+| Function              | Arguments                      | Description                                                                |
+| --------------------- | ------------------------------ | -------------------------------------------------------------------------- |
+| `rename()`            | `self, name: str`              | Changes the subcalendar name to the one supplied in the function argument  |
+| `insert_assignment()` | `self, assignment: Assignment` | Inserts an assignment into the assignments maintaining date order          |
+| `toggle_hidden()`     | `self`                         | Toggles the `hidden` boolean variable between True and False               |
+| `change_color()`      | `self, color: int`             | Changes the subcalendar color to the one supplied in the function argument |
+
+##### Functions
+- `rename(name: str)` - Changes the assignment name to the one supplied in the function argument
+- `insert_assignment()` - Inserts an assignment into the `assignments` list
+- `pop_assignment()` - Removes an assignment from the `assignments` list
+- `toggle_hidden()` - Toggles the `hidden` variable
 
 ### Algorithms
-`zeller()` - calculate first-day offset to properly render the calendar view.
+- `zeller()` - Calculates the first day offset for calendar rendering
 
 ### Class Structure
-`main.py` - application startup and main loop.
-
-`ui.py` - renders the calendar view and handles user input
-
-`subcalendar.py` - defines `Assignment` and `Subcalendar` data structures.
-
-`utils.py` - provides date, time, and calendar logic, as well as some other useful helper functions.
+- `main.py` - Application startup and main loop
+- `ui.py` - Renders calendar view and handles user input
+- `subcalendar.py` - Defines `Assignment` and `Subcalendar` data structures
+- `utils.py` - Provides date, time, calendar logic, and helper functions
 
 ## Deployment
 ### Requirements
-- Python3
-- azure-blob-storage
+- Python 3.x
+- azure-blob-storage (optional, if using Azure blob storage backend)
 
 ### Setup and Installation
 Clone the repository:
@@ -91,20 +140,20 @@ Run the application from the terminal:
 python main.py
 ```
 
-## Storage
-This application supports both local storage and Azure blob storage.
+## Storage Backend
+This application uses a storage backend to handle local storage and Azure blob storage.
 
 ### Local Storage
-The application will use local storage by default, but you may also configure `~/.config/calicula/config` as such:
+The default backend is local storage, but you may also configure it by creating or editing `~/.config/calicula/config`:
 ```
 [storage]
 backend = local
 ```
 
-Subcalendars will be stored locally in plain text files in `~/.config/calicula/subcalendars`. These subcalendar files are read and written on startup and exit.
+Subcalendars are stored as plaintext files in `~/.local/share/subcalendars`. These files are loaded at startup and saved on exit.
 
 ### Azure Blob Storage
-To store subcalendars in an Azure blob storage account, configure `~/.config/calicula/config` as such:
+To use Azure blob storage, configure `~/.config/calicula/config` as such:
 ```
 [storage]
 backend = azure
